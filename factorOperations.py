@@ -102,7 +102,69 @@ def joinFactors(factors: List[Factor]):
 
 
     "*** YOUR CODE HERE ***"
-    raiseNotDefined()
+    def dictHelper(oDict, nDict):
+        oKeys = oDict.keys()
+        nKeys = nDict.keys()
+        for i in oKeys:
+            if i in nKeys:
+                if oDict[i] != nDict[i]:
+                    return False
+        return True
+
+    newFactor = list(factors)[0]
+    newDicts = newFactor.getAllPossibleAssignmentDicts()
+    newProb = []
+    newConds = list(newFactor.conditionedVariables())
+    newUnconds = list(newFactor.unconditionedVariables())
+    for i in newDicts:
+        newProb.append(newFactor.getProbability(i))
+    fList = list(factors)
+    for i in range(1, len(fList)):
+        newestProb = []
+        totalDict = []
+        for assignments in fList[i].getAllPossibleAssignmentDicts():
+            jCopy = []
+            probCopy = []
+            for j in range(len(newDicts)):
+                dictCopy = {}
+                dictCopy.update(newDicts[j])
+                dictCopy.update(assignments)
+                if dictHelper(newDicts[j], dictCopy):
+                    jCopy.append(dictCopy)
+                    probCopy.append(newProb[j] * fList[i].getProbability(assignments))
+            totalDict += jCopy
+            newestProb += probCopy
+        newDicts = totalDict
+        newProb = newestProb
+
+        if len(fList[i].unconditionedVariables()) == 0:
+            for v in fList[i].conditionedVariables():
+                if v in newConds:
+                    newConds.remove(v)
+                if v not in newUnconds:
+                    newUnconds.append(v)
+                print(newUnconds)
+        else:
+            for v in fList[i].unconditionedVariables():
+                if v in newConds:
+                    newConds.remove(v)
+                if v not in newUnconds:
+                    newUnconds.append(v)
+            for v in fList[i].conditionedVariables():
+                if v not in newConds:
+                    newConds.append(v)
+
+    duplicates = []
+    for i in newConds:
+        if i in newUnconds:
+            duplicates.append(i)
+    for i in duplicates:
+        if i in newUnconds:
+            newConds.remove(i)
+    returnFactor = Factor(newUnconds, newConds, newFactor.variableDomainsDict())
+    for i in range(len(newDicts)):
+        returnFactor.setProbability(newDicts[i], newProb[i])
+    return returnFactor
     "*** END YOUR CODE HERE ***"
 
 ########### ########### ###########
