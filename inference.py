@@ -777,7 +777,7 @@ class JointParticleFilter(ParticleFilter):
         if beliefs.total() == 0:
             self.initializeUniformly(gameState)
         else:
-            self.particles = [beliefs.sample() for _ in range(len(self.particles))]
+            self.particles = [beliefs.sample() for _ in range(self.numParticles)]
         "*** END YOUR CODE HERE ***"
 
     ########### ########### ###########
