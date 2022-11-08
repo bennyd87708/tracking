@@ -658,7 +658,21 @@ class ParticleFilter(InferenceModule):
         the DiscreteDistribution may be useful.
         """
         "*** YOUR CODE HERE ***"
-        raiseNotDefined()
+        weights = {}
+        for pos in self.particles:
+            if pos not in weights.keys():
+                weights[pos] = self.getObservationProb(observation,
+                               gameState.getPacmanPosition(), pos, self.getJailPosition())
+            else:
+                weights[pos] += self.getObservationProb(observation,
+                               gameState.getPacmanPosition(), pos, self.getJailPosition())
+        beliefs = self.getBeliefDistribution()
+        for pos in weights.keys():
+            beliefs[pos] = weights[pos]
+        if beliefs.total() == 0:
+            self.initializeUniformly(gameState)
+        else:
+            self.particles = [beliefs.sample() for _ in range(len((self.particles)))]
         "*** END YOUR CODE HERE ***"
     
     ########### ########### ###########
@@ -671,7 +685,11 @@ class ParticleFilter(InferenceModule):
         gameState.
         """
         "*** YOUR CODE HERE ***"
-        raiseNotDefined()
+        new = []
+        for pos in self.particles:
+            newPos = self.getPositionDistribution(gameState, pos)
+            new.append(newPos.sample())
+        self.particles = new
         "*** END YOUR CODE HERE ***"
 
 
@@ -705,7 +723,10 @@ class JointParticleFilter(ParticleFilter):
         """
         self.particles = []
         "*** YOUR CODE HERE ***"
-        raiseNotDefined()
+        pos = list(itertools.product(self.legalPositions, repeat=self.numGhosts))
+        random.shuffle(pos)
+        for i in range(len(pos)):
+            self.particles.append(pos[i % len(pos)])
         "*** END YOUR CODE HERE ***"
 
     def addGhostAgent(self, agent):
