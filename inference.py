@@ -769,7 +769,7 @@ class JointParticleFilter(ParticleFilter):
                 if pos not in weights.keys():
                     weights[pos] = 0
                 total *= self.getObservationProb(observation[ghost],
-                                                            gameState.getPacmanPosition(), pos[ghost], self.getJailPosition(ghost))
+                                                 gameState.getPacmanPosition(), pos[ghost], self.getJailPosition(ghost))
             weights[pos] += total
         beliefs = self.getBeliefDistribution()
         for pos in weights.keys():
